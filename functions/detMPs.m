@@ -1,4 +1,4 @@
-function [fint,Kt,mpData] = detMPs(uvw,mpData)
+function [fint,Kt,mpData] = detMPs(uvw,mpData,nD)
 
 %Stiffness and internal force calculation for all material points
 %--------------------------------------------------------------------------
@@ -51,8 +51,6 @@ tnSMe = sum([mpData.nSMe]);                                                 % to
 krow  = zeros(tnSMe,1); kcol=krow; kval=krow;                               % zero the stiffness information
 ddF   = zeros(3);                                                           % derivative of duvw wrt. spatial position
 
-nD = length(mpData(1).mpC);
-
 if nD==1                                                                    % 1D case
     fPos=1;                                                                 % deformation gradient positions
     aPos=1;                                                                 % material stiffness matrix positions for global stiffness
@@ -104,6 +102,8 @@ for mp=1:nmp                                                                % ma
         [D,Ksig,epsE]=Hooke3d(epsEtr,mpData(mp).mCst);                      % elastic behaviour
     elseif mpData(mp).cmType == 2
         [D,Ksig,epsE]=VMconst(epsEtr,mpData(mp).mCst);                      % elasto-plastic behaviour (von Mises)
+%     elseif mpData(mp).cmType == 3
+%         [D,Ksig,epsE]=DPconst(epsEtr,mpData(mp).mCst);                      % elasto-plastic behaviour (Drucker–Prager)
     end
     %----------------------------------------------------------------------
     
@@ -131,8 +131,8 @@ for mp=1:nmp                                                                % ma
     
     npDoF=(size(ed,1)*size(ed,2))^2;                                        % no. entries in kp
     nnDoF=size(ed,1)*size(ed,2);                                            % no. DoF in kp                        
-    krow(npCnt+1:npCnt+npDoF)=repmat(ed.',nnDoF,1);                         % row position storage
-    kcol(npCnt+1:npCnt+npDoF)=repmat(ed  ,nnDoF,1);                         % column position storage
+    krow(npCnt+1:npCnt+npDoF)=repmat(ed',nnDoF,1);                          % row position storage
+    kcol(npCnt+1:npCnt+npDoF)=repmat(ed ,nnDoF,1);                          % column position storage
     kval(npCnt+1:npCnt+npDoF)=kp;                                           % stiffness storage
     npCnt=npCnt+npDoF;                                                      % number of entries in Kt
     fint(ed)=fint(ed)+fp;                                                   % internal force contribution

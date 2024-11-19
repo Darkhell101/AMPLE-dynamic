@@ -48,7 +48,7 @@ for i=1:nD
     end
 end
 if nD == 1
-    indx = [];                                                              % index for basis derivatives (1D)
+    indx=[];                                                                % index for basis derivatives (1D)
 elseif nD == 2
     indx = [2; 1];                                                          % index for basis derivatives (2D)
 elseif nD == 3

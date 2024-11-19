@@ -9,7 +9,7 @@ function [fext] = detExtForce(nodes,nD,g,mpData)
 % and point forces at material points.
 %
 %--------------------------------------------------------------------------
-% [fbdy,mpData] = DETEXTFORCE(coord,etpl,g,eIN,mpData)
+% [fbdy,mpData] = DETEXTFORCE(nodes,nD,g,mpData)
 %--------------------------------------------------------------------------
 % Input(s):
 % nodes  - number of nodes (total in mesh)
@@ -28,7 +28,7 @@ function [fext] = detExtForce(nodes,nD,g,mpData)
 % 
 %--------------------------------------------------------------------------
 
-nmp  = size(mpData,2);                                                      % number of material points & dimensions 
+nmp  = size(mpData,2);                                                      % number of material points & dimensions
 fext = zeros(nodes*nD,1);                                                   % zero the external force vector
 grav = zeros(nD,1); grav(nD) = -g;                                          % gavity vector
 for mp = 1:nmp
@@ -36,7 +36,8 @@ for mp = 1:nmp
    nn  = length(nIN);                                                       % number of nodes influencing the MP
    Svp = mpData(mp).Svp;                                                    % basis functions
    fp  = (mpData(mp).mpM*grav + mpData(mp).fp)*Svp;                         % material point body & point nodal forces
-   ed  = repmat((nIN-1)*nD,nD,1)+repmat((1:nD).',1,nn);                     % nodel degrees of freedom 
+   ed  = repmat((nIN-1)*nD,nD,1)+repmat((1:nD).',1,nn);                     % nodel degrees of freedom
+   % ed  = (nIN-1)*nD + (1:nD).';                                             % nodel degrees of freedom
    fext(ed) = fext(ed) + fp;                                                % combine into external force vector
 end
 end

@@ -1,4 +1,4 @@
-function [mpData] = updateMPs(uvw,mpData)
+function [mpData] = updateMPs(uvw,A,dt,mpData)
 
 %Material point update: stress, position and volume
 %--------------------------------------------------------------------------
@@ -23,6 +23,7 @@ function [mpData] = updateMPs(uvw,mpData)
 %--------------------------------------------------------------------------
 % Input(s):
 % uvw    - nodal displacements (nodes*nD,1)
+% A      - grid acceleration
 % mpData - material point structured array.  The function requires:
 %           - mpC : material point coordinates
 %           - Svp : basis functions
@@ -37,6 +38,8 @@ function [mpData] = updateMPs(uvw,mpData)
 %           - Fn    : converged deformation gradient
 %           - u     : material point total displacement
 %           - lp    : domain lengths (GIMPM only)
+%           - mpA   : material point acceleration
+%           - mpV   : material point velocity
 %--------------------------------------------------------------------------
 % See also:
 % 
@@ -55,11 +58,22 @@ for mp=1:nmp
     mpData(mp).vp    = det(F)*mpData(mp).vp0;                               % update material point volumes
     mpData(mp).epsEn = mpData(mp).epsE;                                     % update material point elastic strains
     mpData(mp).Fn    = mpData(mp).F;                                        % update material point deformation gradients
-    mpData(mp).u     = mpData(mp).u + mpU.';                                % update material point displacements
+    mpData(mp).u     = mpData(mp).u + mpU';                                 % update material point displacements
     if mpData(mp).mpType == 2                                               % GIMPM only (update domain lengths)        
         [V,D] = eig(F.'*F);                                                 % eigen values and vectors F'F
         U     = V*sqrt(D)*V.';                                              % material stretch matrix        
         mpData(mp).lp = (mpData(mp).lp0).*U(t(1:nD));                       % update domain lengths
     end
+end
+
+%% update dynamic information
+for mp=1:nmp
+    nIN = mpData(mp).nIN;                                                   % nodes associated with material point
+    nn  = length(nIN);                                                      % number nodes
+    N   = mpData(mp).Svp;                                                   % basis functions            
+    ed  = repmat((nIN.'-1)*nD,1,nD)+repmat((1:nD),nn,1);                    % nodal degrees of freedom
+    mpA = N*A(ed);                                                          % material point acceleration
+    mpData(mp).mpV = mpData(mp).mpV+(mpData(mp).mpA+mpA')*dt/2;             % update material point velocity
+    mpData(mp).mpA = mpA';                                                  % update material point acceleration
 end
 end
