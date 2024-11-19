@@ -1,4 +1,4 @@
-function [lstps,g,mpData,mesh] = setupGrid
+function [lstps,dt,g,mpData,mesh] = setupGrid
 
 %Problem setup information
 %--------------------------------------------------------------------------
@@ -58,13 +58,14 @@ E      = 1e4;   v = 0;                                                      % Yo
 mCst   = [E v];                                                             % material constants
 g      = 10;                                                                % gravity
 rho    = 80;                                                                % material density
-lstps  = 40;                                                                % number of loadsteps
+lstps  = 50;                                                                % number of loadsteps
 nelsx  = 1;                                                                 % number of elements in the x direction
-nelsy  = 2^9;                                                               % number of elements in the y direction
-ly     = 50;  lx = ly/nelsy;                                                % domain dimensions
+nelsy  = 2^4;                                                               % number of elements in the y direction
+ly     = 16;  lx = ly/nelsy;                                                % domain dimensions
 mp     = 2;                                                                 % number of material points in each direction per element
 mpType = 2;                                                                 % material point type: 1 = MPM, 2 = GIMP
 cmType = 1;                                                                 % constitutive model: 1 = elastic, 2 = vM plasticity
+dt     = 4e-2;                                                              % time increment
 
 %% Mesh generation
 [etpl,coord] = formCoord2D(nelsx,nelsy,lx,ly);                              % background mesh generation
@@ -131,7 +132,9 @@ for mp = nmp:-1:1                                                           % lo
   mpData(mp).mCst   = mCst;                                                 % material constants (or internal variables) for constitutive model
   mpData(mp).fp     = zeros(nD,1);                                          % point forces at material points
   mpData(mp).u      = zeros(nD,1);                                          % material point displacements
-  if mpData(mp).mpType == 2
+  mpData(mp).mpV    = zeros(nD,1);                                          % material point velocity
+  mpData(mp).mpA    = zeros(nD,1);                                          % material point acceleration
+  if mpData(mp).mpType ~= 1
     mpData(mp).lp     = lp(mp,:);                                           % material point domain lengths (GIMP)
     mpData(mp).lp0    = lp(mp,:);                                           % initial material point domain lengths (GIMP)
   else

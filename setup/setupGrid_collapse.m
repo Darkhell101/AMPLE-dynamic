@@ -1,4 +1,4 @@
-function [lstps,g,mpData,mesh] = setupGrid_collapse
+function [lstps,dt,g,mpData,mesh] = setupGrid_collapse
 
 %Problem setup information
 %--------------------------------------------------------------------------
@@ -63,9 +63,10 @@ ly=8;  lx=8;                                                                % do
 mp=6;                                                                       % number of material points in each direction per element
 mpType = 2;                                                                 % material point type: 1 = MPM, 2 = GIMP
 cmType = 2;                                                                 % constitutive model: 1 = elastic, 2 = vM plasticity
+dt     = 1e-1;                                                              % time increment
 
 %% Mesh generation
-[etpl,coord] = formCoord2D(2*nelsx,nelsy,2*lx,ly);                          % background mesh generation
+[etpl,coord] = formCoord2D(4*nelsx,nelsy,4*lx,ly);                          % background mesh generation
 [~,nen]      = size(etpl);                                                  % number of element nodes
 [nodes,nD]   = size(coord);                                                 % number of nodes and dimensions
 h            = [lx ly]./[nelsx nelsy];                                      % element lengths in each direction
@@ -128,7 +129,9 @@ for mp = nmp:-1:1                                                           % lo
   mpData(mp).mCst   = mCst;                                                 % material constants (or internal variables) for constitutive model
   mpData(mp).fp     = zeros(nD,1);                                          % point forces at material points
   mpData(mp).u      = zeros(nD,1);                                          % material point displacements
-  if mpData(mp).mpType == 2
+  mpData(mp).mpV    = zeros(nD,1);                                          % material point velocity
+  mpData(mp).mpA    = zeros(nD,1);                                          % material point acceleration
+  if mpData(mp).mpType ~= 1
     mpData(mp).lp     = lp(mp,:);                                           % material point domain lengths (GIMP)
     mpData(mp).lp0    = lp(mp,:);                                           % initial material point domain lengths (GIMP)
   else

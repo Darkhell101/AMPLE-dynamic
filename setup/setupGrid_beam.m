@@ -1,4 +1,4 @@
-function [lstps,g,mpData,mesh] = setupGrid_beam
+function [lstps,dt,g,mpData,mesh] = setupGrid_beam
 
 %Problem setup information
 %--------------------------------------------------------------------------
@@ -53,17 +53,18 @@ function [lstps,g,mpData,mesh] = setupGrid_beam
 E=12e6;   v=0.2;   fc=20e4;                                                 % Young's modulus, Poisson's ratio, yield strength   
 mCst=[E v fc];                                                              % material constants
 g=10;                                                                       % gravity
-rho=0;                                                                      % material density
-P=-100e3;                                                                   % applied end load
+rho=100;                                                                    % material density
+P=-100e1;                                                                   % applied end load
 lstps=50;                                                                   % number of loadsteps
-a = 1;                                                                      % element multiplier
+a = 2;                                                                      % element multiplier
 nelsx=22*a;                                                                 % number of elements in the x direction
 nelsy=20*a;                                                                 % number of elements in the y direction
 ly=10;  lx=11;                                                              % domain dimensions
 d=1;  l=10;                                                                 % beam dimensions
-mp=6;                                                                       % number of material points in each direction per element
-mpType = 2;                                                                 % material point type: 1 = MPM, 2 = GIMP
+mp=4;                                                                       % number of material points in each direction per element
+mpType = 1;                                                                 % material point type: 1 = MPM, 2 = GIMP
 cmType = 1;                                                                 % constitutive model: 1 = elastic, 2 = vM plasticity
+dt     = 5e-2;                                                              % time increment
 
 %% Mesh generation
 [etpl,coord] = formCoord2D(nelsx,nelsy,lx,ly);                              % background mesh generation
@@ -92,7 +93,7 @@ mesh.h     = h;                                                             % me
 %% Material point generation
 ngp    = mp^nD;                                                             % number of material points per element
 GpLoc  = detMpPos(mp,nD);                                                   % local MP locations
-N      = shapefunc(nen,GpLoc,nD);                                         % basis functions for the material points
+N      = shapefunc(nen,GpLoc,nD);                                           % basis functions for the material points
 [etplmp,coordmp] = formCoord2D(20*a,2*a,l,d);                               % mesh for MP generation
 coordmp(:,2)=coordmp(:,2)+(ly-d);                                           % adjust MP locations (vertical)
 nelsmp = size(etplmp,1);                                                    % no. elements populated with material points
@@ -134,7 +135,9 @@ for mp = nmp:-1:1                                                           % lo
     mpData(mp).fp   = zeros(nD,1);                                          % point forces at material points
   end
   mpData(mp).u      = zeros(nD,1);                                          % material point displacements
-  if mpData(mp).mpType == 2
+  mpData(mp).mpV    = zeros(nD,1);                                          % material point velocity
+  mpData(mp).mpA    = zeros(nD,1);                                          % material point acceleration
+  if mpData(mp).mpType ~= 1
     mpData(mp).lp     = lp(mp,:);                                           % material point domain lengths (GIMP)
     mpData(mp).lp0    = lp(mp,:);                                           % initial material point domain lengths (GIMP)
   else
