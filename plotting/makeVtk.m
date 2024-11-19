@@ -1,4 +1,4 @@
-function makeVtk(coord,etpl,uvw,meshName)
+function makeVtk(coord,etpl,meshName)
 
 %VTK output file generation: mesh data
 %--------------------------------------------------------------------------
@@ -13,7 +13,6 @@ function makeVtk(coord,etpl,uvw,meshName)
 % Input(s):
 % coord    - coordinates of the grid nodes (nodes,nD)
 % etpl     - element topology (nels,nen) 
-% uvw      - incremental deformations (nodes*nD,1)
 % meshName - VTK file name, for example 'mesh.vtk'  
 %--------------------------------------------------------------------------
 % See also:
@@ -87,39 +86,4 @@ fprintf(fid,'\n');
 fprintf(fid,'CELL_TYPES %i\n',nels);
 fprintf(fid,'%i\n',elemId*ones(nels,1));       
 fprintf(fid,'\n');
-
-%% displacement output
-fprintf(fid,'POINT_DATA %i\n',nodes);
-if nD==3
-    fprintf(fid,'SCALARS u_x FLOAT %i\n',1);
-    fprintf(fid,'LOOKUP_TABLE default\n');
-    fprintf(fid,'%f\n',uvw(1:nD:end));
-    fprintf(fid,'\n');
-    
-    fprintf(fid,'SCALARS u_y FLOAT %i\n',1);
-    fprintf(fid,'LOOKUP_TABLE default\n');
-    fprintf(fid,'%f\n',uvw(2:nD:end));
-    fprintf(fid,'\n');
-    
-    fprintf(fid,'SCALARS u_z FLOAT %i\n',1);
-    fprintf(fid,'LOOKUP_TABLE default\n');
-    fprintf(fid,'%f\n',uvw(3:nD:end));
-    fprintf(fid,'\n');
-elseif nD==2
-    fprintf(fid,'SCALARS u_x FLOAT %i\n',1);
-    fprintf(fid,'LOOKUP_TABLE default\n');
-    fprintf(fid,'%f\n',uvw(1:nD:end));
-    fprintf(fid,'\n');
-    
-    fprintf(fid,'SCALARS u_y FLOAT %i\n',1);
-    fprintf(fid,'LOOKUP_TABLE default\n');
-    fprintf(fid,'%f\n',uvw(2:nD:end));
-    fprintf(fid,'\n');
-elseif nD==1
-    fprintf(fid,'SCALARS u_x FLOAT %i\n',1);
-    fprintf(fid,'LOOKUP_TABLE default\n');
-    fprintf(fid,'%f\n',uvw);
-    fprintf(fid,'\n');
-end
-fclose('all');
 end
