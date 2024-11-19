@@ -1,3 +1,25 @@
+# AMPLE-dynamic
+Here is an implementation of implicit dynamic material point method (MPM) based on newmark's method.
+
+The related Papers are listed as:
+(1) Implicit time integration for the material point method: Quantitative and algorithmic comparisons with the finite element method
+(2) AMPLE: A Material Point Learning Environment
+(3) An implicit locking-free B-spline Material Point Method for large strain geotechnical modelling
+
+The main algorithm is from the third paper.
+I reproduce some of its work, and Xie Mian makes a significant revision to my wrong implementation.
+You can find traces from the main function of the code.
+Additionally, the correspondence author of the third paper, López-Querol Susana, offers rather important assistance.
+
+Importantly, this is a toy implementation.
+If one wants to do more research based on it, one may be intrested in the work of [William M. Coombs](https://www.durham.ac.uk/staff/w-m-coombs/)
+
+The aim of this repository is to decrease the effort for main algorithm and to focus more meaningful topics, like constitutive laws, contact, impact...
+
+If any problems, my mail is [lgd1447210528@gmail.com](lgd1447210528@gmail.com). I will reply and answer if I know.
+
+
+
 # AMPLE
 AMPLE - A Material Point Learning Environment
 
